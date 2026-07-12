@@ -1,0 +1,3 @@
+# Week 1
+requests          # making HTTP calls to the weather API
+opencv-python     # webcam capture + displaying the video feed

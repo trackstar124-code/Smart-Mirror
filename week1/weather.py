@@ -1,0 +1,78 @@
+"""Week 1 deliverable: fetch and print current weather for your city.
+
+Goal: run `python weather.py` and see the current temperature and conditions
+printed to the terminal. This is a throwaway learning script — keep it simple.
+
+Fill in the TODOs yourself. Pointers are given, not answers.
+"""
+
+# TODO: import the library you'll use to make the web request.
+#       (Look up: "python requests library get")
+
+
+def get_api_key():
+    """API key (2d7d7b7d5cc7b52d93ce41186fd10b29)"""
+    """Return your weather API key.
+
+    Best practice: don't hard-code secrets in your file. Read the key from an
+    environment variable instead so it never ends up in git.
+
+    Look up:
+      - "python os.environ read environment variable"
+      - how to set an env var in your shell (export WEATHER_API_KEY=...)
+
+    Returns:
+        str: the API key.
+    """
+    # TODO: read and return the key from an environment variable.
+    raise NotImplementedError
+
+
+def fetch_weather(city, api_key):
+    """Call the weather API and return the raw response data.
+
+    You'll make an HTTP GET request to your chosen API's "current weather"
+    endpoint, passing the city and (if required) the API key.
+
+    Look up:
+      - your API's docs for the current-weather endpoint URL and its parameters
+      - "requests.get params argument" (how to pass query parameters cleanly)
+      - "response.json()" (turning the reply into a Python dict)
+
+    Args:
+        city (str): the city name to look up.
+        api_key (str): your API key (may be unused for keyless APIs).
+
+    Returns:
+        dict: the parsed JSON response from the API.
+    """
+    # TODO: build the request, send it, and return response.json()
+    raise NotImplementedError
+
+
+def print_weather(data):
+    """Pull the temperature and conditions out of the response and print them.
+
+    The API returns a nested dictionary. Your job is to figure out which keys
+    hold the temperature and the text description, then print them nicely.
+
+    Look up:
+      - how to inspect a dict you don't know the shape of (print it, or use
+        the API docs' example response)
+      - dictionary indexing vs. .get()
+
+    Args:
+        data (dict): the parsed response from fetch_weather().
+    """
+    # TODO: extract temp + conditions from `data` and print them.
+    raise NotImplementedError
+
+
+def main():
+    """Tie it together: get key -> fetch -> print."""
+    # TODO: set your city, call the functions above in order.
+    raise NotImplementedError
+
+
+if __name__ == "__main__":
+    main()

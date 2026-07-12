@@ -1,0 +1,16 @@
+# Virtual environment
+.venv/
+venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Environment / secrets (keep your API key OUT of git)
+.env
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
