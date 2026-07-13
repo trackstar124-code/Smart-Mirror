@@ -1,15 +1,5 @@
 import requests
 import os
-"""Week 1 deliverable: fetch and print current weather for your city.
-
-Goal: run `python weather.py` and see the current temperature and conditions
-printed to the terminal. This is a throwaway learning script — keep it simple.
-
-Fill in the TODOs yourself. Pointers are given, not answers.
-"""
-
-# TODO: import the library you'll use to make the web request.
-#       (Look up: "python requests library get")
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -20,7 +10,7 @@ def get_api_key():
     return api_key
 
 
-def fetch_weather(lat: float, lon: float, api_key, units="metric"):
+def fetch_weather(lat: float, lon: float, api_key, units="imperial"):
     """Fetch the weather data using the get_api_key function"""
     url = "https://api.openweathermap.org/data/2.5/weather"
     params = {
@@ -35,33 +25,18 @@ def fetch_weather(lat: float, lon: float, api_key, units="metric"):
 
 
 def print_weather(data):
-    """Pull the temperature and conditions out of the response and print them.
+    """prints the weather data for Boston"""
+    temp = data["main"]["temp"]
+    city = data["name"]
 
-    The API returns a nested dictionary. Your job is to figure out which keys
-    hold the temperature and the text description, then print them nicely.
-
-    Look up:
-      - how to inspect a dict you don't know the shape of (print it, or use
-        the API docs' example response)
-      - dictionary indexing vs. .get()
-
-    Args:
-        data (dict): the parsed response from fetch_weather().
-    """
-    # TODO: extract temp + conditions from `data` and print them.
-    raise NotImplementedError
+    print(f"{city}: {temp}°F")
 
 
 def main():
-    """Tie it together: get key -> fetch -> print."""
-    # TODO: set your city, call the functions above in order.
-    raise NotImplementedError
-
+    """Runs all the function above in order to give an output"""
+    api_key = get_api_key()                           
+    data = fetch_weather(42.3601, -71.0589, api_key)  # Boston coords need to change later to be dynamic
+    print_weather(data)
 
 if __name__ == "__main__":
-    api_key = get_api_key()
-    print(api_key)                             
-    data = fetch_weather(42.3601, -71.0589, api_key)  # Boston coords need to change later to be dynamic
-    print(data)
-
-
+    main()
