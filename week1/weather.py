@@ -15,31 +15,23 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def get_api_key():
+    """Gets API key from the .env file"""
     api_key = os.environ.get("WEATHER_API_KEY")
     return api_key
 
 
-
-def fetch_weather(city, api_key):
-    """Call the weather API and return the raw response data.
-
-    You'll make an HTTP GET request to your chosen API's "current weather"
-    endpoint, passing the city and (if required) the API key.
-
-    Look up:
-      - your API's docs for the current-weather endpoint URL and its parameters
-      - "requests.get params argument" (how to pass query parameters cleanly)
-      - "response.json()" (turning the reply into a Python dict)
-
-    Args:
-        city (str): the city name to look up.
-        api_key (str): your API key (may be unused for keyless APIs).
-
-    Returns:
-        dict: the parsed JSON response from the API.
-    """
-    # TODO: build the request, send it, and return response.json()
-    raise NotImplementedError
+def fetch_weather(lat: float, lon: float, api_key, units="metric"):
+    """Fetch the weather data using the get_api_key function"""
+    url = "https://api.openweathermap.org/data/2.5/weather"
+    params = {
+        "lat": lat,
+        "lon": lon,
+        "appid": api_key,
+        "units": units
+    }
+    response = requests.get(url, params=params)
+    response.raise_for_status()   # causes the api call not to work if the api call failed
+    return response.json()
 
 
 def print_weather(data):
@@ -67,4 +59,9 @@ def main():
 
 
 if __name__ == "__main__":
-    print(get_api_key())
+    api_key = get_api_key()
+    print(api_key)                             
+    data = fetch_weather(42.3601, -71.0589, api_key)  # Boston coords need to change later to be dynamic
+    print(data)
+
+
