@@ -1,3 +1,5 @@
+import requests
+import os
 """Week 1 deliverable: fetch and print current weather for your city.
 
 Goal: run `python weather.py` and see the current temperature and conditions
@@ -9,23 +11,13 @@ Fill in the TODOs yourself. Pointers are given, not answers.
 # TODO: import the library you'll use to make the web request.
 #       (Look up: "python requests library get")
 
+from dotenv import load_dotenv
+load_dotenv()
 
 def get_api_key():
-    """API key (2d7d7b7d5cc7b52d93ce41186fd10b29)"""
-    """Return your weather API key.
+    api_key = os.environ.get("WEATHER_API_KEY")
+    return api_key
 
-    Best practice: don't hard-code secrets in your file. Read the key from an
-    environment variable instead so it never ends up in git.
-
-    Look up:
-      - "python os.environ read environment variable"
-      - how to set an env var in your shell (export WEATHER_API_KEY=...)
-
-    Returns:
-        str: the API key.
-    """
-    # TODO: read and return the key from an environment variable.
-    raise NotImplementedError
 
 
 def fetch_weather(city, api_key):
@@ -75,4 +67,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    print(get_api_key())
