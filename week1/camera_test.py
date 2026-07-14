@@ -35,18 +35,8 @@ def show_feed(capture):
 
 
 def cleanup(capture):
-    """Release the camera and close any OpenCV windows.
-
-    Forgetting this can leave your webcam "locked" until you restart.
-
-    Look up:
-      - ".release()" and "cv2.destroyAllWindows()"
-
-    Args:
-        capture: the VideoCapture object to release.
-    """
-    # TODO: release the camera and destroy the windows.
-    raise NotImplementedError
+    capture.release()
+    cv2.destroyAllWindows()
 
 
 def main():
@@ -58,8 +48,7 @@ def main():
     try:
         show_feed(cap)
     finally:
-        cap.release()
-        cv2.destroyAllWindows()
+        cleanup(cap)
 
 
 if __name__ == "__main__":
