@@ -1,15 +1,4 @@
 import cv2
-"""Week 1 deliverable: open your webcam and show the live feed in a window.
-
-Goal: run `python camera_test.py`, see yourself in a window, and press a key
-(commonly 'q') to close it cleanly. Throwaway learning script.
-
-Fill in the TODOs yourself. Pointers are given, not answers.
-"""
-
-# TODO: import the computer-vision library you installed.
-#       (Look up: "opencv python import cv2")
-
 
 def open_camera():
     """This Function open camera"""
@@ -35,6 +24,7 @@ def show_feed(capture):
 
 
 def cleanup(capture):
+    """Function to cleanup after the camera runs and destorys window"""
     capture.release()
     cv2.destroyAllWindows()
 
