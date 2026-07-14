@@ -1,3 +1,4 @@
+import cv2
 """Week 1 deliverable: open your webcam and show the live feed in a window.
 
 Goal: run `python camera_test.py`, see yourself in a window, and press a key
@@ -11,20 +12,12 @@ Fill in the TODOs yourself. Pointers are given, not answers.
 
 
 def open_camera():
-    """Create and return a handle to the webcam.
+    cap = cv2.VideoCapture(0)
 
-    OpenCV represents the camera as a "VideoCapture" object. Index 0 is
-    usually your built-in webcam.
-
-    Look up:
-      - "cv2.VideoCapture"
-      - how to check whether the camera actually opened (.isOpened())
-
-    Returns:
-        the VideoCapture object.
-    """
-    # TODO: create the capture object and return it.
-    raise NotImplementedError
+    if not cap.isOpened():
+        print("Error: could not open camera")
+        return None
+    return cap
 
 
 def show_feed(capture):
@@ -64,9 +57,14 @@ def cleanup(capture):
 
 def main():
     """Open the camera, show the feed, then clean up."""
+    cap = open_camera()
+    if cap is None:
+        return
+    print("Camera opened successfully")
+    cap.release()
     # TODO: call the functions above in order.
     #       Tip: wrap show_feed in try/finally so cleanup always runs.
-    raise NotImplementedError
+
 
 
 if __name__ == "__main__":
