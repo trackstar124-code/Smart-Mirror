@@ -12,6 +12,7 @@ Fill in the TODOs yourself. Pointers are given, not answers.
 
 
 def open_camera():
+    """This Function open camera"""
     cap = cv2.VideoCapture(0)
 
     if not cap.isOpened():
@@ -21,23 +22,16 @@ def open_camera():
 
 
 def show_feed(capture):
-    """Continuously read frames and display them until the user quits.
+    """This function shows the feed for the camera"""
+    while True:
+        ret, frame = capture.read()
+        if not ret:
+            print("Failed to grab frame")
+            break
 
-    The pattern is a loop:
-      1. read one frame from the camera
-      2. show it in a window
-      3. check if the user pressed the quit key; if so, break
-
-    Look up:
-      - "cv2 read frame loop" (.read() returns two things — what are they?)
-      - "cv2.imshow"
-      - "cv2.waitKey" (why is it needed, and how to detect a keypress)
-
-    Args:
-        capture: the VideoCapture object from open_camera().
-    """
-    # TODO: write the capture loop described above.
-    raise NotImplementedError
+        cv2.imshow('Feed', frame)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
 
 
 def cleanup(capture):
@@ -61,10 +55,11 @@ def main():
     if cap is None:
         return
     print("Camera opened successfully")
-    cap.release()
-    # TODO: call the functions above in order.
-    #       Tip: wrap show_feed in try/finally so cleanup always runs.
-
+    try:
+        show_feed(cap)
+    finally:
+        cap.release()
+        cv2.destroyAllWindows()
 
 
 if __name__ == "__main__":
