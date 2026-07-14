@@ -24,6 +24,21 @@ def fetch_weather(lat: float, lon: float, api_key, units="imperial"):
     return response.json()
 
 
+def get_location():
+    "Get location for where ever the decive is"
+    url = "http://ip-api.com/json/"
+    params = {
+        "fields": "city,country,lat,lon,timezone"
+        }
+    try:
+        response = requests.get(url, params=params, timeout=5)
+        response.raise_for_status()
+        return response.json()
+    except requests.RequestException as e:
+        print(f"Error fetching location: {e}")
+        return None
+
+
 def print_weather(data):
     """prints the weather data for Boston"""
     temp = data["main"]["temp"]
@@ -34,8 +49,16 @@ def print_weather(data):
 
 def main():
     """Runs all the function above in order to give an output"""
-    api_key = get_api_key()                           
-    data = fetch_weather(42.3601, -71.0589, api_key)  # Boston coords need to change later to be dynamic
+    api_key = get_api_key()
+    location = get_location()
+
+    if location is None:
+        print("Could not determine location, defaulting to Boston.")
+        lat, lon = 42.3601, -71.0589
+    else:
+        lat, lon = location["lat"], location["lon"]
+                            
+    data = fetch_weather(lat, lon, api_key)
     print_weather(data)
 
 if __name__ == "__main__":

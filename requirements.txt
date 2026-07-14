@@ -2,3 +2,6 @@
 requests          # making HTTP calls to the weather API
 opencv-python     # webcam capture + displaying the video feed
 python-dotenv     # loads variables from a .env file into the environment
+
+# Week 2
+flask             # web framework: serves the dashboard page to the browser
