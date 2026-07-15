@@ -8,6 +8,7 @@ Then open http://localhost:8000 in your browser.
 
 Fill in the TODOs yourself. Pointers are given, not answers.
 """
+from modules.clock import get_time
 from flask import Flask, render_template
 
 # Create the Flask application.
@@ -24,7 +25,10 @@ app = Flask(
 @app.route("/")
 def index():
     """Serve the main dashboard page (the index.html template)."""
-    return render_template("index.html")
+    clock = get_time()
+    return render_template("index.html", clock=clock)
+
+
 
 
 if __name__ == "__main__":
