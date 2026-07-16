@@ -8,6 +8,7 @@ Then open http://localhost:8000 in your browser.
 
 Fill in the TODOs yourself. Pointers are given, not answers.
 """
+from modules.weather import get_weather
 from modules.clock import get_time
 from flask import Flask, render_template
 
@@ -26,7 +27,8 @@ app = Flask(
 def index():
     """Serve the main dashboard page (the index.html template)."""
     clock = get_time()
-    return render_template("index.html", clock=clock)
+    weather = get_weather()
+    return render_template("index.html", clock=clock, weather=weather)
 
 
 

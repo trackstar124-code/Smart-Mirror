@@ -46,9 +46,15 @@ def print_weather(data):
 
     print(f"{city}: {temp}°F")
 
+def return_weather(data):
+    """Extract the temp + city from an API response and return them as a dict."""
+    temp = data["main"]["temp"]
+    city = data["name"]
+    return {"temp": temp, "city": city}
 
-def main():
-    """Runs all the function above in order to give an output"""
+
+def get_weather():
+    """Do the full weather pipeline and return a dict for the dashboard."""
     api_key = get_api_key()
     location = get_location()
 
@@ -59,7 +65,7 @@ def main():
         lat, lon = location["lat"], location["lon"]
                             
     data = fetch_weather(lat, lon, api_key)
-    print_weather(data)
+    return return_weather(data)
 
 if __name__ == "__main__":
-    main()
+    print(get_weather())
