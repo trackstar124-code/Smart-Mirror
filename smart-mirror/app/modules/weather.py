@@ -43,14 +43,14 @@ def print_weather(data):
     """prints the weather data for Boston"""
     temp = data["main"]["temp"]
     city = data["name"]
-
     print(f"{city}: {temp}°F")
 
 def return_weather(data):
     """Extract the temp + city from an API response and return them as a dict."""
     temp = data["main"]["temp"]
     city = data["name"]
-    return {"temp": temp, "city": city}
+    icon = data["weather"][0]["icon"]
+    return {"temp": temp, "city": city, "icon": icon}
 
 
 def get_weather():

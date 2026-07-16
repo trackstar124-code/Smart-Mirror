@@ -16,7 +16,10 @@
             <div class="time">{{ clock.time }}</div>
         </div>
         <div id="weather">
-            <div class="temp">{{ weather.temp }}°F</div>
+            <div class="current">
+                <div class="temp">{{ weather.temp }}°F</div>
+                <img src="https://openweathermap.org/img/wn/{{ weather.icon }}@2x.png" alt="weather">
+            </div>
             <div class="city">{{ weather.city }}</div>
         </div>
 </body>
