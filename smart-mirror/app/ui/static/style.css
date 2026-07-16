@@ -1,16 +1,10 @@
-/* Smart Mirror styles.
-   Fill in the TODOs. Each rule targets an element from index.html.
-   CSS syntax reminder:  selector { property: value; }
-*/
 
-/* ---- The whole page ----
-   This one is DONE as a worked example so you can see full syntax and get the
-   core "mirror" look right away: black background, white text, centered. */
+
 body {
-    background-color: black;   /* mirrors show light text on a black screen */
-    color: white;              /* default text color for everything */
+    background-color: black;
+    color: white;      
     font-family: Helvetica, sans-serif;
-    margin: 0;                   /* remove the browser's default page margin */
+    margin: 0;
 }
 
 /* The clock block */
@@ -29,7 +23,7 @@ body {
     text-align: center;
 }
 
-/* ---- The weather block ---- */
+/* The weather block */
 #weather {
     font-size: 2.5rem;
     text-align: center;

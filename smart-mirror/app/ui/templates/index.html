@@ -7,10 +7,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <!-- This is the page Flask serves once you switch index() to render_template.
-         For now it's a simple placeholder. In Week 2 you'll add widgets here:
-         a clock, the date, and the weather. -->
-    <h1>Smart Mirror</h1>
+    <h1></h1>
         <div id="clock">
             <div class="date">{{ clock.date }}</div>
             <div class="time">{{ clock.time }}</div>
@@ -21,6 +18,11 @@
                 <img src="https://openweathermap.org/img/wn/{{ weather.icon }}@2x.png" alt="weather">
             </div>
             <div class="city">{{ weather.city }}</div>
+        </div>
+        <div id="events">
+            {% for event in events %}
+                <div class="event">{{ event.date }} — {{ event.title }}</div>
+            {% endfor %}
         </div>
 </body>
 </html>
