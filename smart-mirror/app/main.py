@@ -8,6 +8,7 @@ Then open http://localhost:8000 in your browser.
 
 Fill in the TODOs yourself. Pointers are given, not answers.
 """
+from modules.month import get_calendar
 from modules.events import get_events
 from modules.weather import get_weather
 from modules.clock import get_time
@@ -30,7 +31,8 @@ def index():
     clock = get_time()
     weather = get_weather()
     events = get_events()
-    return render_template("index.html", clock=clock, weather=weather, events=events)
+    cal = get_calendar()
+    return render_template("index.html", clock=clock, weather=weather, events=events, cal=cal)
 
 
 if __name__ == "__main__":

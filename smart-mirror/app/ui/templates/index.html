@@ -24,5 +24,26 @@
                 <div class="event">{{ event.date }} — {{ event.title }}</div>
             {% endfor %}
         </div>
+        <div id="calendar">
+            <div class="cal-title">{{ cal.month_name }} {{ cal.year }}</div>
+            <table>
+                <tr>
+                    <th>Su</th><th>Mo</th><th>Tu</th><th>We</th><th>Th</th><th>Fr</th><th>Sa</th>
+                </tr>
+                {% for week in cal.weeks %}
+                <tr>
+                    {% for day in week %}
+                        {% if day == 0 %}
+                            <td></td>
+                        {% elif day == cal.today %}
+                            <td class="today">{{ day }}</td>
+                        {% else %}
+                            <td>{{ day }}</td>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
 </body>
 </html>
