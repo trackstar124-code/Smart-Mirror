@@ -37,16 +37,47 @@ body {
 .city {
     font-size: 1.5rem;
     text-align: center;
+    margin-top: -2rem;
 }
 
 .current {
     display: flex;
     align-items: center;   
     justify-content: center;  
-    margin-left: 3rem;
+    margin-left: 2rem;
 }
 
 .today {
     color: red;
     font-weight: bold;
+}
+
+#calendar {
+    width: fit-content;   /* shrink the container to hug its widest child (the table) */
+    margin-left: 2rem;    /* move the WHOLE calendar block to the left */
+}
+
+#calendar table {
+    border-collapse: collapse;   /* removes the default gaps between cells */
+    margin: 0;              /* auto left/right margins = centers the table */
+}
+#calendar td, #calendar th {
+    width: 2.8rem;              /* equal cell widths → a proper grid */
+    height: 2.8rem;             /* equal heights → square-ish cells */
+    text-align: center;         /* center the number in each cell */
+}
+
+#calendar th {
+    font-size: 0.9rem;          /* smaller than the numbers */
+    opacity: 0.5;               /* dimmed — less attention-grabbing */
+    text-transform: uppercase;  /* SU MO TU... (subtle, formal look) */
+    letter-spacing: 0.1rem;     /* a little breathing room between letters */
+    font-weight: 400;
+}
+
+.cal-title {
+    font-size: 1.5rem;
+    letter-spacing: 0.15rem;
+    margin-bottom: 0.8rem;      /* gap between title and the grid */
+    text-align: center;
 }
