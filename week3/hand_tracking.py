@@ -11,6 +11,25 @@ hands = mp_hands.Hands(
     min_detection_confidence=0.7,
 )
 
+def detect_gesture(hand):
+    """Checks for a fist and open palm and prints OPEN PALM when there is an open palm and FIST when there is a fist"""
+    fingers_up = 0
+    if hand.landmark[8].y < hand.landmark[6].y:
+        fingers_up += 1
+    if hand.landmark[12].y < hand.landmark[10].y:
+        fingers_up += 1
+    if hand.landmark[16].y < hand.landmark[14].y:
+        fingers_up += 1
+    if hand.landmark[20].y < hand.landmark[18].y:
+        fingers_up += 1
+
+    if fingers_up == 4:
+        return "OPEN_PALM"
+    elif fingers_up == 0:
+        return "FIST"
+    else:
+        return "UNKNOWN"
+
 def main():
     """Takes the video capture and makes it so that the video has hand tracking"""
     cap = cv2.VideoCapture(0)
@@ -27,6 +46,8 @@ def main():
         if results.multi_hand_landmarks:
             for hand in results.multi_hand_landmarks:
                 mp_draw.draw_landmarks(frame, hand, mp_hands.HAND_CONNECTIONS)
+                gesture = detect_gesture(hand)   # figure out palm / fist
+                print(gesture)                   # Week 3 deliverable: print it live
 
         cv2.imshow("Hand Tracking", frame)
         if cv2.waitKey(1) & 0xFF == ord("q"):
