@@ -10,9 +10,17 @@ hands = mp_hands.Hands(
     max_num_hands=1,               # track one hand for now
     min_detection_confidence=0.7,
 )
+def distance(a, b):
+    """Distance formula"""
+    return ((a.x - b.x) ** 2 + (a.y - b.y) ** 2) ** 0.5
 
 def detect_gesture(hand):
-    """Checks for a fist and open palm and prints OPEN PALM when there is an open palm and FIST when there is a fist"""
+    """Checks for a fist and open palm and prints OPEN PALM when there is an open palm and FIST when there is a fist Now 
+    returns OK when the OK sign is made"""
+    pinch = distance(hand.landmark[4], hand.landmark[8]) < 0.05
+    middle_up = hand.landmark[12].y < hand.landmark[10].y
+    ring_up   = hand.landmark[16].y < hand.landmark[14].y
+    pinky_up  = hand.landmark[20].y < hand.landmark[18].y
     fingers_up = 0
     if hand.landmark[8].y < hand.landmark[6].y:
         fingers_up += 1
@@ -22,6 +30,9 @@ def detect_gesture(hand):
         fingers_up += 1
     if hand.landmark[20].y < hand.landmark[18].y:
         fingers_up += 1
+    """Below is the OK hand gesture detection"""
+    if pinch and middle_up and ring_up and pinky_up:
+        return "OK"
 
     if fingers_up == 4:
         return "OPEN_PALM"
