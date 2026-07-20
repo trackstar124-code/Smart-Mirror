@@ -1,7 +1,11 @@
 # Week 1
-requests          # making HTTP calls to the weather API
-opencv-python     # webcam capture + displaying the video feed
-python-dotenv     # loads variables from a .env file into the environment
+requests                          # making HTTP calls to the weather API
+opencv-contrib-python==4.11.0.86  # webcam + cv2 (contrib build, pairs with mediapipe/numpy<2)
+python-dotenv                     # loads variables from a .env file into the environment
 
 # Week 2
 flask             # web framework: serves the dashboard page to the browser
+
+# Week 3
+mediapipe==0.10.21  # hand/gesture detection. PINNED: needs Python <= 3.12, and
+                    # 0.10.35+ removed the legacy `solutions` API we use.
