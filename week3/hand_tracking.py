@@ -44,6 +44,7 @@ def detect_gesture(hand):
 def main():
     """Takes the video capture and makes it so that the video has hand tracking"""
     cap = cv2.VideoCapture(0)
+    prev_x = None
 
     while True:
         ret, frame = cap.read()
@@ -57,8 +58,16 @@ def main():
         if results.multi_hand_landmarks:
             for hand in results.multi_hand_landmarks:
                 mp_draw.draw_landmarks(frame, hand, mp_hands.HAND_CONNECTIONS)
+                wrist_x = hand.landmark[0].x     # wrist x position
                 gesture = detect_gesture(hand)   # figure out palm / fist
                 print(gesture)                   # Week 3 deliverable: print it live
+                if prev_x is not None:
+                    dx = wrist_x - prev_x
+                    if dx > 0.1:
+                        print("Swipe Right")
+                    elif dx < -0.1:
+                        print("Swipe Left")
+                prev_x = wrist_x
 
         cv2.imshow("Hand Tracking", frame)
         if cv2.waitKey(1) & 0xFF == ord("q"):
