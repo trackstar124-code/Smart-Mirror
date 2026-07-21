@@ -12,6 +12,7 @@ from modules.month import get_calendar
 from modules.events import get_events
 from modules.weather import get_weather
 from modules.clock import get_time
+from modules.gestures import read_gesture
 from flask import Flask, render_template, jsonify
 
 
@@ -38,7 +39,7 @@ def index():
 
 @app.route("/api/gesture")
 def api_gesture():
-    return jsonify({"gesture": "OPEN_PALM"})
+    return jsonify({"gesture": read_gesture()})
 
 
 
