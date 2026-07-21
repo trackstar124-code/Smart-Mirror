@@ -12,7 +12,9 @@ from modules.month import get_calendar
 from modules.events import get_events
 from modules.weather import get_weather
 from modules.clock import get_time
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify
+
+
 
 # Create the Flask application.
 #   __name__            -> tells Flask where this app lives (standard boilerplate)
@@ -33,6 +35,11 @@ def index():
     events = get_events()
     cal = get_calendar()
     return render_template("index.html", clock=clock, weather=weather, events=events, cal=cal)
+
+@app.route("/api/gesture")
+def api_gesture():
+    return jsonify({"gesture": "OPEN_PALM"})
+
 
 
 

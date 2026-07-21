@@ -1,5 +1,5 @@
 // Smart Mirror — front-end behavior (JavaScript runs in the BROWSER).
-//
+// 
 // Step 1: switch between views. For now we test with the arrow keys.
 // Later, gestures (via the Flask endpoint) will call showView() instead.
 
@@ -22,7 +22,7 @@ function showView(index) {
     current = index;
 }
 
-// --- TEMPORARY test controls: arrow keys switch views ---
+// TEMPORARY test controls: arrow keys switch views
 // This proves the switching works before we wire in gestures.
 document.addEventListener("keydown", function (event) {
     if (event.key === "ArrowRight") {
@@ -33,3 +33,23 @@ document.addEventListener("keydown", function (event) {
         showView((current - 1 + views.length) % views.length);
     }
 });
+
+// --- Gesture polling (STEP 3) — YOU fill this in ---
+// Ask the Flask endpoint what gesture is happening, then switch views to match.
+function pollGesture() {
+    fetch("/api/gesture")
+        .then(response => response.json())
+        .then(data => {
+        switch(data.gesture) {
+            case "OPEN_PALM":
+                showView(0);
+                break;
+            case "FIST":
+                showView(1);
+                break;
+        }
+        })
+        .catch(err => console.error("Gesture poll failed:", err));
+    }
+    setInterval(pollGesture, 300);
+
