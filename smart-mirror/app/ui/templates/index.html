@@ -7,7 +7,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h1></h1>
+    <!-- ===== VIEW 1: Home (clock + weather). Starts visible via class "active". ===== -->
+    <div id="view-home" class="view active">
         <div id="clock">
             <div class="date">{{ clock.date }}</div>
             <div class="time">{{ clock.time }}</div>
@@ -19,6 +20,10 @@
             </div>
             <div class="city">{{ weather.city }}</div>
         </div>
+    </div>
+
+    <!-- ===== VIEW 2: Calendar (events + calendar). Hidden until switched to. ===== -->
+    <div id="view-calendar" class="view">
         <div id="events">
             {% for event in events %}
                 <div class="event">{{ event.date }} — {{ event.title }}</div>
@@ -45,5 +50,10 @@
                 {% endfor %}
             </table>
         </div>
+    </div>
+
+    <!-- Load our JavaScript (the "behavior" layer). Must be at the end so the
+         HTML above already exists when the script runs. -->
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
 </html>

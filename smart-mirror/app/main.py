@@ -35,6 +35,7 @@ def index():
     return render_template("index.html", clock=clock, weather=weather, events=events, cal=cal)
 
 
+
 if __name__ == "__main__":
     # debug=True auto-reloads the server whenever you save a change,
     # and shows helpful error pages in the browser while you're learning.
