@@ -5,4 +5,3 @@ def get_time():
     date = now.strftime("%A, %B %d")
     time = now.strftime("%H:%M:%S")
     return {"date": date, "time": time}
-

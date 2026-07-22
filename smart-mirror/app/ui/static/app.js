@@ -37,19 +37,27 @@ function pollGesture() {
     fetch("/api/gesture")
         .then(response => response.json())
         .then(data => {
-        const now = Date.now();
-        if (now - lastCall < COOLDOWN_MS) return;
-        switch(data.gesture) {
-            case "OK":
-                showView(0);
-                lastCall = now;
-                break;
-            case "FIST":
-                showView(1);
-                lastCall = now;
-                break;
-        }
+            const now = Date.now();
+            if (now - lastCall < COOLDOWN_MS) return;
+            switch (data.gesture) {
+                case "OK":
+                    showView(0);
+                    lastCall = now;
+                    break;
+                case "FIST":
+                    showView(1);
+                    lastCall = now;
+                    break;
+            }
         })
         .catch(err => console.error("Gesture poll failed:", err));
-    }
-    setInterval(pollGesture, 300);
+}
+setInterval(pollGesture, 300);
+
+//make it so the clock updates in the Html
+function updateClock() {
+    const time = new Date().toLocaleTimeString();
+    document.getElementById("time-display").innerText = time;
+}
+updateClock();
+setInterval(updateClock, 1000);

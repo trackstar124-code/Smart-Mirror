@@ -16,7 +16,6 @@ from modules.gestures import read_gesture
 from flask import Flask, render_template, jsonify
 
 
-
 # Create the Flask application.
 #   __name__            -> tells Flask where this app lives (standard boilerplate)
 #   template_folder     -> where your HTML files live (relative to THIS file)
