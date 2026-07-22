@@ -1,13 +1,10 @@
-// Smart Mirror — front-end behavior (JavaScript runs in the BROWSER).
-// 
-// Step 1: switch between views. For now we test with the arrow keys.
-// Later, gestures (via the Flask endpoint) will call showView() instead.
-
 // The list of view element ids, in order. To add a screen later, add its id here.
 const views = ["view-home", "view-calendar"];
+const COOLDOWN_MS = 3000; // 3 seconds
 
 // Which view is currently showing (an index into `views`). Starts at 0 = home.
 let current = 0;
+let lastCall = 0;
 
 // Show one view and hide the rest.
 //   index = which view to show (0, 1, ...)
@@ -40,16 +37,19 @@ function pollGesture() {
     fetch("/api/gesture")
         .then(response => response.json())
         .then(data => {
+        const now = Date.now();
+        if (now - lastCall < COOLDOWN_MS) return;
         switch(data.gesture) {
-            case "OPEN_PALM":
+            case "OK":
                 showView(0);
+                lastCall = now;
                 break;
             case "FIST":
                 showView(1);
+                lastCall = now;
                 break;
         }
         })
         .catch(err => console.error("Gesture poll failed:", err));
     }
     setInterval(pollGesture, 300);
-
