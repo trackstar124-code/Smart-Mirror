@@ -87,6 +87,10 @@ def run():
                 if gesture != last_gesture:
                     write_gesture(gesture)
                     last_gesture = gesture
+        else:
+            if last_gesture != "NONE":
+                write_gesture("NONE")
+                last_gesture = "NONE"
 
         cv2.imshow("Gestures", frame)
         if cv2.waitKey(1) & 0xFF == ord("q"):
