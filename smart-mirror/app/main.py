@@ -8,6 +8,8 @@ Then open http://localhost:8000 in your browser.
 
 Fill in the TODOs yourself. Pointers are given, not answers.
 """
+import threading
+from modules.gestures import run as run_gestures
 from modules.month import get_calendar
 from modules.events import get_events
 from modules.weather import get_weather
@@ -40,10 +42,11 @@ def index():
 def api_gesture():
     return jsonify({"gesture": read_gesture()})
 
-
-
-
 if __name__ == "__main__":
-    # debug=True auto-reloads the server whenever you save a change,
-    # and shows helpful error pages in the browser while you're learning.
-    app.run(host="0.0.0.0", port=8000, debug=True)
+    gesture_thread = threading.Thread(
+        target=run_gestures,
+        daemon=True
+    )
+    gesture_thread.start()
+    app.run(host="0.0.0.0", port=8000, debug=True, use_reloader=False)
+
