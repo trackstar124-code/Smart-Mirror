@@ -43,10 +43,9 @@ def api_gesture():
     return jsonify({"gesture": read_gesture()})
 
 if __name__ == "__main__":
-    gesture_thread = threading.Thread(
-        target=run_gestures,
-        daemon=True
-    )
-    gesture_thread.start()
+    #gesture_thread = threading.Thread(
+    #    target=run_gestures,
+    #    daemon=True
+    #)
+    #gesture_thread.start()
     app.run(host="0.0.0.0", port=8000, debug=True, use_reloader=False)
-
