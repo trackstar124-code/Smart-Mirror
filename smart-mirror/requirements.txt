@@ -1,0 +1,35 @@
+# ─── Smart Mirror — Python Dependencies ───────────────────────────────────────
+#
+# Install on your Mac (dev):
+#   pip install -r requirements.txt
+#
+# Install on Raspberry Pi (important: read the Pi notes below first!):
+#   pip install -r requirements.txt
+#
+# ──────────────────────────────────────────────────────────────────────────────
+
+# Web server (app/main.py)
+flask
+
+# HTTP requests (modules/weather.py)
+requests
+
+# Environment variable loader — reads your .env file for WEATHER_API_KEY
+python-dotenv
+
+# ─── Computer Vision / Gesture Detection (modules/gestures.py) ────────────────
+#
+# PI NOTE ⚠️: "opencv-python" works on your Mac but may fail on Pi because it
+# tries to build a GUI window (cv2.imshow). On a headless Pi you may need:
+#   opencv-python-headless
+# Research: what's the difference between the two packages?
+#
+opencv-python
+
+# PI NOTE ⚠️: MediaPipe does NOT have an official pip wheel for Raspberry Pi ARM.
+# You will need to either:
+#   (a) install a community-built wheel (search: "mediapipe raspberry pi arm64")
+#   (b) build from source
+# This is the trickiest dependency — plan time for it!
+#
+mediapipe

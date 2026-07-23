@@ -1,4 +1,4 @@
-"""Smart Mirror web app (Week 2).
+"""Smart Mirror web app.
 
 Serves a fullscreen dashboard (time, date, weather) to the browser.
 
