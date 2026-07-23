@@ -9,7 +9,7 @@ Then open http://localhost:8000 in your browser.
 Fill in the TODOs yourself. Pointers are given, not answers.
 """
 import threading
-from modules.gestures import run as run_gestures
+#from modules.gestures import run as run_gestures
 from modules.month import get_calendar
 from modules.events import get_events
 from modules.weather import get_weather
