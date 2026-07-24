@@ -24,7 +24,7 @@ python-dotenv
 #   opencv-python-headless
 # Research: what's the difference between the two packages?
 #
-opencv-python
+opencv-python-headless
 
 # PI NOTE ⚠️: MediaPipe does NOT have an official pip wheel for Raspberry Pi ARM.
 # You will need to either:

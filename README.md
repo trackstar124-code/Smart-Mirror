@@ -17,23 +17,26 @@ A fullscreen smart mirror dashboard built with Flask and Python, designed to run
 ## Project Structure
 
 ```
-smart-mirror/
-├── app/
-│   ├── main.py                  # Flask app entry point
-│   ├── modules/
-│   │   ├── clock.py             # Time & date widget
-│   │   ├── weather.py           # OpenWeatherMap integration
-│   │   ├── events.py            # Events loader
-│   │   ├── month.py             # Calendar widget
-│   │   ├── gestures.py          # Camera loop + MediaPipe gesture detection
-│   │   ├── events.json          # Your events data
-│   │   └── gesture_state.txt    # Shared state file for gesture IPC
-│   └── ui/
-│       ├── templates/           # HTML templates (Jinja2)
-│       └── static/              # CSS, JS, images
-├── .env                         # Your secrets (NOT committed to git)
-├── .env.example                 # Template — copy this to .env
-├── requirements.txt             # Python dependencies
+.
+├── smart-mirror/
+│   ├── app/
+│   │   ├── main.py                  # Flask app entry point
+│   │   ├── modules/
+│   │   │   ├── clock.py             # Time & date widget
+│   │   │   ├── weather.py           # OpenWeatherMap integration
+│   │   │   ├── events.py            # Events loader
+│   │   │   ├── month.py             # Calendar widget
+│   │   │   ├── gestures.py          # Camera loop + MediaPipe gesture detection
+│   │   │   ├── events.json          # Your events data
+│   │   │   └── gesture_state.txt    # Shared state file for gesture IPC
+│   │   └── ui/
+│   │       ├── templates/           # HTML templates (Jinja2)
+│   │       └── static/              # CSS, JS, images
+│   ├── requirements.txt             # smart-mirror dependencies
+│   ├── config.py
+│   └── .env.example                 # Template — copy this to .env
+├── requirements.txt                 # Root Python dependencies
+├── start.sh                         # Master start script for Raspberry Pi
 └── README.md
 ```
 
@@ -44,7 +47,7 @@ smart-mirror/
 ### 1. Clone the repo
 ```bash
 git clone <your-repo-url>
-cd smart-mirror
+cd <your-repo-folder-name>
 ```
 
 ### 2. Create a virtual environment
@@ -54,8 +57,10 @@ source .venv/bin/activate
 ```
 
 ### 3. Install dependencies
+*(Note: If you use `./start.sh` below, it will do this automatically!)*
 ```bash
 pip install -r requirements.txt
+pip install -r smart-mirror/requirements.txt
 ```
 
 ### 4. Set up your API key
@@ -67,7 +72,7 @@ Get a free key at [openweathermap.org/api](https://openweathermap.org/api).
 
 ### 5. Run the app
 ```bash
-python app/main.py
+./start.sh
 ```
 Then open **http://localhost:8000** in your browser.
 
@@ -91,27 +96,28 @@ Then open **http://localhost:8000** in your browser.
 # Option A — Git
 git clone <your-repo-url>
 
-# Option B — SCP from your Mac
-scp -r smart-mirror/ pi@<pi-ip>:~/smart-mirror
+# Option B — SCP from your Mac (assuming you transfer the entire folder)
+scp -r ./* pi@<pi-ip>:~/smart-mirror-project
 ```
 
 **2. Install dependencies on the Pi:**
 ```bash
-cd smart-mirror
+cd smart-mirror-project # or your clone folder
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+pip install -r smart-mirror/requirements.txt
 ```
 
 **3. Set up your `.env`:**
 ```bash
-cp .env.example .env
+cp smart-mirror/.env.example .env
 nano .env   # paste your real API key
 ```
 
 **4. Run the app:**
 ```bash
-python app/main.py
+./start.sh
 ```
 
 ### Autostart on Boot (systemd)
@@ -124,8 +130,8 @@ After=network.target
 
 [Service]
 User=pi
-WorkingDirectory=/home/pi/smart-mirror
-ExecStart=/home/pi/smart-mirror/.venv/bin/python app/main.py
+WorkingDirectory=/home/pi/smart-mirror-project
+ExecStart=/home/pi/smart-mirror-project/start.sh
 Restart=always
 
 [Install]
