@@ -33,3 +33,7 @@ opencv-python-headless
 # This is the trickiest dependency — plan time for it!
 #
 mediapipe
+
+# ─── Testing ──────────────────────────────────────────────────────────────────
+pytest
+pytest-mock
