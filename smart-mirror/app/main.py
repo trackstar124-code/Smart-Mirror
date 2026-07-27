@@ -15,6 +15,7 @@ from modules.events import get_events
 from modules.weather import get_weather
 from modules.clock import get_time
 from modules.gestures import read_gesture
+from modules.news import get_news
 from flask import Flask, render_template, jsonify
 
 
@@ -41,6 +42,10 @@ def index():
 @app.route("/api/gesture")
 def api_gesture():
     return jsonify({"gesture": read_gesture()})
+
+@app.route("/api/news")
+def api_news():
+    return jsonify({"articles": get_news()})
 
 if __name__ == "__main__":
     #gesture_thread = threading.Thread(

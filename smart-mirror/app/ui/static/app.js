@@ -61,3 +61,59 @@ function updateClock() {
 }
 updateClock();
 setInterval(updateClock, 1000);
+
+
+
+// --- NYT News Logic (Backend Polling & Rotation) ---
+let newsArticles = [];
+let currentNewsIndex = 0;
+let newsRotationInterval = null;
+
+function displayCurrentNews() {
+    const newsContent = document.getElementById('nyt-news-content');
+    if (!newsContent || newsArticles.length === 0) return;
+
+    const article = newsArticles[currentNewsIndex];
+    newsContent.innerHTML = '';
+
+    const div = document.createElement('div');
+    div.className = 'headline';
+
+    const link = document.createElement('a');
+    link.href = article.url;
+    link.target = '_blank';
+    link.textContent = article.title;
+
+    div.appendChild(link);
+    newsContent.appendChild(div);
+
+    // Increment index to show the next article on the next tick
+    currentNewsIndex = (currentNewsIndex + 1) % newsArticles.length;
+}
+
+function pollNews() {
+    fetch("/api/news")
+        .then(response => response.json())
+        .then(data => {
+            const articles = data.articles;
+            if (!articles || articles.length === 0) {
+                return; // Keep existing content if fetch fails or is empty
+            }
+
+            // Update our global list and reset index
+            newsArticles = articles;
+            currentNewsIndex = 0;
+
+            // Display the first one immediately
+            displayCurrentNews();
+
+            // Clear any existing rotation and start a new one (every 30 seconds)
+            if (newsRotationInterval) clearInterval(newsRotationInterval);
+            newsRotationInterval = setInterval(displayCurrentNews, 30 * 1000);
+        })
+        .catch(err => console.error("News poll failed:", err));
+}
+
+// Fetch news immediately, then every 30 minutes
+pollNews();
+setInterval(pollNews, 30 * 60 * 1000);
