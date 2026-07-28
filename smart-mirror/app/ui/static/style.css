@@ -49,13 +49,13 @@ body {
 }
 
 #weather-icon {
-    width: 70px;
-    height: 70px;
+    width: 105px;
+    height: 105px;
     filter: drop-shadow(0 0 6px rgba(255,255,255,0.3));
 }
 
 #weather-temp {
-    font-size: 3.5rem;
+    font-size: 5.25rem;
     font-weight: 300;
     line-height: 1;
 }
@@ -85,20 +85,30 @@ body {
 }
 
 .forecast-label {
-    font-size: 0.85rem;
+    font-size: 1.275rem;
     opacity: 0.55;
     text-transform: uppercase;
     letter-spacing: 0.06rem;
 }
 
 .forecast-icon {
-    width: 40px;
-    height: 40px;
+    width: 60px;
+    height: 60px;
 }
 
-.forecast-temp {
-    font-size: 1rem;
+.forecast-temps {
+    display: flex;
+    gap: 6px;
+    font-size: 1.425rem;
     font-weight: 400;
+}
+
+.forecast-high {
+    color: #ffffff;
+}
+
+.forecast-low {
+    opacity: 0.45;
 }
 
 .today {

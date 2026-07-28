@@ -87,7 +87,7 @@ def fetch_forecast(lat: float, lon: float, api_key, units="imperial"):
     return response.json()
 
 def get_forecast():
-    """Return a list of up to 4 future daily forecasts (noon-ish reading per day)."""
+    """Return a list of up to 4 future daily forecasts with high and low temps."""
     api_key = get_api_key()
     location = get_location()
 
@@ -100,35 +100,42 @@ def get_forecast():
     entries = data.get("list", [])
 
     today_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    seen_days = set()
-    forecast = []
 
+    # First pass: group every 3-hour slot by day to find true daily high/low
+    day_data = {}   # day_str -> {"temps": [...], "icon": str}
     for entry in entries:
-        dt_txt = entry.get("dt_txt", "")         # e.g. "2024-07-29 12:00:00"
-        day_str = dt_txt[:10]                    # "2024-07-29"
-        hour    = dt_txt[11:13]                  # "12"
+        dt_txt = entry.get("dt_txt", "")
+        day_str = dt_txt[:10]
+        hour    = dt_txt[11:13]
 
-        # Skip today; only grab ~noon (12:00) readings so we get one per day
         if day_str == today_str:
-            continue
-        if hour != "12":
-            continue
-        if day_str in seen_days:
-            continue
+            continue  # skip today
 
-        seen_days.add(day_str)
+        temp = entry["main"]["temp"]
+        icon = entry["weather"][0]["icon"]
+
+        if day_str not in day_data:
+            day_data[day_str] = {"temps": [], "icon": icon}
+
+        day_data[day_str]["temps"].append(temp)
+
+        # Use the noon icon as the representative icon for the day
+        if hour == "12":
+            day_data[day_str]["icon"] = icon
+
+    # Second pass: build the sorted forecast list
+    forecast = []
+    for day_str in sorted(day_data.keys())[:4]:
+        temps  = day_data[day_str]["temps"]
         dt_obj = datetime.strptime(day_str, "%Y-%m-%d")
         forecast.append({
-            "day":  dt_obj.strftime("%a"),       # "Mon", "Tue", …
-            "temp": round(entry["main"]["temp"]),
-            "icon": entry["weather"][0]["icon"],
+            "day":      dt_obj.strftime("%a"),      # "Mon", "Tue", …
+            "temp_high": round(max(temps)),
+            "temp_low":  round(min(temps)),
+            "icon":      day_data[day_str]["icon"],
         })
 
-        if len(forecast) == 4:
-            break
-
     return forecast
-
 
 if __name__ == "__main__":
     print(get_weather())

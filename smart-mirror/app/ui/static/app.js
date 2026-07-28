@@ -146,7 +146,10 @@ function pollWeather() {
                         <img class="forecast-icon"
                              src="https://openweathermap.org/img/wn/${day.icon}@2x.png"
                              alt="${day.day} weather">
-                        <div class="forecast-temp">${day.temp}°F</div>
+                        <div class="forecast-temps">
+                            <span class="forecast-high">${day.temp_high}°</span>
+                            <span class="forecast-low">${day.temp_low}°</span>
+                        </div>
                     </div>
                 `).join("");
             }
