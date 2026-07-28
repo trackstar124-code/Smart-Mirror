@@ -15,12 +15,25 @@
             <div class="date">{{ clock.date }}</div>
             <div id="time-display" class="time">{{ clock.time }}</div>
         </div>
-        <div id="weather">
-            <div class="current">
-                <div class="temp">{{ weather.temp }}°F</div>
-                <img src="https://openweathermap.org/img/wn/{{ weather.icon }}@2x.png" alt="weather">
+
+        <!-- Weather panel: fixed top-right corner -->
+        <div id="weather-panel">
+            <div id="weather-current">
+                <img id="weather-icon" src="https://openweathermap.org/img/wn/{{ weather.icon }}@2x.png" alt="weather icon">
+                <div id="weather-temp">{{ weather.temp | round | int }}°F</div>
             </div>
-            <div class="city">{{ weather.city }}</div>
+            <div id="weather-city">{{ weather.city }}</div>
+
+            <!-- 4-day forecast strip -->
+            <div id="weather-forecast">
+                {% for day in forecast %}
+                <div class="forecast-day">
+                    <div class="forecast-label">{{ day.day }}</div>
+                    <img class="forecast-icon" src="https://openweathermap.org/img/wn/{{ day.icon }}@2x.png" alt="{{ day.day }} weather">
+                    <div class="forecast-temp">{{ day.temp }}°F</div>
+                </div>
+                {% endfor %}
+            </div>
         </div>
 
         <!-- NYT News Container -->

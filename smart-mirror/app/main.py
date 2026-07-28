@@ -12,7 +12,7 @@ import threading
 #from modules.gestures import run as run_gestures
 from modules.month import get_calendar
 from modules.events import get_events
-from modules.weather import get_weather
+from modules.weather import get_weather, get_forecast
 from modules.clock import get_time
 from modules.gestures import read_gesture
 from modules.news import get_news
@@ -35,13 +35,19 @@ def index():
     """Serve the main dashboard page (the index.html template)."""
     clock = get_time()
     weather = get_weather()
+    forecast = get_forecast()
     events = get_events()
     cal = get_calendar()
-    return render_template("index.html", clock=clock, weather=weather, events=events, cal=cal)
+    return render_template("index.html", clock=clock, weather=weather, forecast=forecast, events=events, cal=cal)
 
 @app.route("/api/gesture")
 def api_gesture():
     return jsonify({"gesture": read_gesture()})
+
+@app.route("/api/weather")
+def api_weather():
+    """Return current weather + 4-day forecast as JSON."""
+    return jsonify({"current": get_weather(), "forecast": get_forecast()})
 
 @app.route("/api/news")
 def api_news():

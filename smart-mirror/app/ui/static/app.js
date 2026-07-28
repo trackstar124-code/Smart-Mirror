@@ -117,3 +117,43 @@ function pollNews() {
 // Fetch news immediately, then every 30 minutes
 pollNews();
 setInterval(pollNews, 30 * 60 * 1000);
+
+
+// --- Weather live refresh (every 10 minutes) ---
+function pollWeather() {
+    fetch("/api/weather")
+        .then(response => response.json())
+        .then(data => {
+            const current  = data.current;
+            const forecast = data.forecast;
+
+            // Update current weather
+            if (current) {
+                const iconEl = document.getElementById("weather-icon");
+                const tempEl = document.getElementById("weather-temp");
+                const cityEl = document.getElementById("weather-city");
+                if (iconEl) iconEl.src = `https://openweathermap.org/img/wn/${current.icon}@2x.png`;
+                if (tempEl) tempEl.textContent = `${Math.round(current.temp)}°F`;
+                if (cityEl) cityEl.textContent = current.city;
+            }
+
+            // Re-render forecast strip
+            const forecastEl = document.getElementById("weather-forecast");
+            if (forecastEl && forecast && forecast.length > 0) {
+                forecastEl.innerHTML = forecast.map(day => `
+                    <div class="forecast-day">
+                        <div class="forecast-label">${day.day}</div>
+                        <img class="forecast-icon"
+                             src="https://openweathermap.org/img/wn/${day.icon}@2x.png"
+                             alt="${day.day} weather">
+                        <div class="forecast-temp">${day.temp}°F</div>
+                    </div>
+                `).join("");
+            }
+        })
+        .catch(err => console.error("Weather poll failed:", err));
+}
+
+// Refresh weather immediately, then every 10 minutes
+pollWeather();
+setInterval(pollWeather, 10 * 60 * 1000);

@@ -32,28 +32,73 @@ body {
     text-align: center;
 }
 
-/* The weather block */
-#weather {
-    font-size: 2.5rem;
-    text-align: center;
+/* ---- Top-right weather panel ---- */
+#weather-panel {
+    position: fixed;
+    top: 30px;
+    right: 40px;
+    text-align: right;
+    z-index: 10;
 }
 
-.temp {
-    font-size: 2rem;
-    text-align: center;
-}
-
-.city {
-    font-size: 1.5rem;
-    text-align: center;
-    margin-top: -2rem;
-}
-
-.current {
+#weather-current {
     display: flex;
     align-items: center;
-    justify-content: center;
-    margin-left: 2rem;
+    justify-content: flex-end;
+    gap: 0;
+}
+
+#weather-icon {
+    width: 70px;
+    height: 70px;
+    filter: drop-shadow(0 0 6px rgba(255,255,255,0.3));
+}
+
+#weather-temp {
+    font-size: 3.5rem;
+    font-weight: 300;
+    line-height: 1;
+}
+
+#weather-city {
+    font-size: 1.1rem;
+    opacity: 0.6;
+    margin-top: -4px;
+    letter-spacing: 0.05rem;
+}
+
+/* ---- 4-day forecast strip ---- */
+#weather-forecast {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255,255,255,0.15);
+}
+
+.forecast-day {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.forecast-label {
+    font-size: 0.85rem;
+    opacity: 0.55;
+    text-transform: uppercase;
+    letter-spacing: 0.06rem;
+}
+
+.forecast-icon {
+    width: 40px;
+    height: 40px;
+}
+
+.forecast-temp {
+    font-size: 1rem;
+    font-weight: 400;
 }
 
 .today {
