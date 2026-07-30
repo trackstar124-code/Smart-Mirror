@@ -44,9 +44,38 @@ echo "Dashboard available at: http://localhost:8000"
 echo "Press Ctrl+C to stop both the web server and gesture recognition."
 echo "=========================================================="
 
-# Trap SIGINT (Ctrl+C) and kill both background processes
-trap "echo -e '\nStopping Smart Mirror...'; kill $GESTURES_PID $MAIN_PID 2>/dev/null; exit" INT TERM
+# Function to clean up
+cleanup() {
+    echo
+    echo "Stopping Smart Mirror..."
+    kill $GESTURES_PID $MAIN_PID 2>/dev/null
+}
 
-# Wait for processes so the script doesn't exit immediately
-wait $MAIN_PID
-wait $GESTURES_PID
+# Trap Ctrl+C
+trap "cleanup; exit" INT TERM
+
+# Wait until either process exits
+wait -n
+EXIT_CODE=$?
+
+echo
+echo "=========================================================="
+echo "A process has exited!"
+echo "Exit code: $EXIT_CODE"
+echo "=========================================================="
+
+# Check which process died
+if ! kill -0 $GESTURES_PID 2>/dev/null; then
+    echo "gestures.py has stopped or crashed."
+fi
+
+if ! kill -0 $MAIN_PID 2>/dev/null; then
+    echo "main.py has stopped or crashed."
+fi
+
+# Stop any remaining process
+cleanup
+
+echo
+echo "The program has paused so you can read any Python errors above."
+read -p "Press Enter to close..."
