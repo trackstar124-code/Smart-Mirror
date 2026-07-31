@@ -20,6 +20,8 @@ from pathlib import Path
 from typing import Optional
 import os
 
+import sys as _sys
+_sys.path.insert(0, str(Path(__file__).parent))   # ensure modules/ dir is importable
 from download_models import ensure_models
 
 # ── Shared state file ──────────────────────────────────────────────────────────
