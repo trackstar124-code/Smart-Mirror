@@ -8,13 +8,13 @@ Then open http://localhost:8000 in your browser.
 
 Fill in the TODOs yourself. Pointers are given, not answers.
 """
-import threading
+#import threading
 #from modules.gestures import run as run_gestures
 from modules.month import get_calendar
 from modules.events import get_events
 from modules.weather import get_weather, get_forecast
 from modules.clock import get_time
-from modules.gestures import read_gesture
+#from modules.gestures import read_gesture
 from modules.news import get_news
 from flask import Flask, render_template, jsonify
 
@@ -40,9 +40,9 @@ def index():
     cal = get_calendar()
     return render_template("index.html", clock=clock, weather=weather, forecast=forecast, events=events, cal=cal)
 
-@app.route("/api/gesture")
-def api_gesture():
-    return jsonify({"gesture": read_gesture()})
+#@app.route("/api/gesture")
+#def api_gesture():
+#    return jsonify({"gesture": read_gesture()})
 
 @app.route("/api/weather")
 def api_weather():
