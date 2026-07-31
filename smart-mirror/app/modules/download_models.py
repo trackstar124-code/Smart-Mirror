@@ -24,7 +24,7 @@ _BASE_URL = (
 # (filename, sha256 of the downloaded file)
 _MODELS = {
     "palm_detection_full_Nx3x192x192_post.onnx": None,   # size check only
-    "hand_landmark_full_Nx3x224x224.onnx": None,
+    "hand_landmark_sparse_Nx3x224x224.onnx": None,
 }
 
 
@@ -64,7 +64,7 @@ def ensure_models() -> dict[str, Path]:
 
     return {
         "palm":     MODELS_DIR / "palm_detection_full_Nx3x192x192_post.onnx",
-        "landmark": MODELS_DIR / "hand_landmark_full_Nx3x224x224.onnx",
+        "landmark": MODELS_DIR / "hand_landmark_sparse_Nx3x224x224.onnx",
     }
 
 
