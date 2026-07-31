@@ -26,13 +26,13 @@ python-dotenv
 #
 opencv-python-headless
 
-# PI NOTE ⚠️: MediaPipe does NOT have an official pip wheel for Raspberry Pi ARM.
-# You will need to either:
-#   (a) install a community-built wheel (search: "mediapipe raspberry pi arm64")
-#   (b) build from source
-# This is the trickiest dependency — plan time for it!
-#
-mediapipe
+# Numerical arrays — preprocessing tensors for ONNX inference.
+numpy
+
+# ONNX Runtime — runs hand-landmark & palm-detector ONNX models.
+# Official ARM64 wheels ship for both Apple Silicon and Raspberry Pi 64-bit,
+# so no custom build step is needed on the Pi (unlike the old mediapipe dep).
+onnxruntime
 
 # ─── Testing ──────────────────────────────────────────────────────────────────
 pytest
