@@ -59,12 +59,7 @@ if [ -f "$SMART_MIRROR_DIR/requirements.txt" ]; then
     "$PIP" install -r "$SMART_MIRROR_DIR/requirements.txt"
 fi
 
-# Start gestures.py
-echo "Starting gestures.py..."
-"$PYTHON" -u "$SMART_MIRROR_DIR/app/modules/gestures.py" &
-GESTURES_PID=$!
-
-# Start main.py
+# Start main.py only
 echo "Starting main.py..."
 "$PYTHON" -u "$SMART_MIRROR_DIR/app/main.py" &
 MAIN_PID=$!
@@ -79,28 +74,20 @@ echo "=========================================================="
 cleanup() {
     echo
     echo "Stopping Smart Mirror..."
-    kill "$GESTURES_PID" "$MAIN_PID" 2>/dev/null
+    kill "$MAIN_PID" 2>/dev/null
 }
 
 trap "cleanup; exit" INT TERM
 
-# Wait until one process exits
-wait -n
+# Wait for main.py to exit
+wait "$MAIN_PID"
 EXIT_CODE=$?
 
 echo
 echo "=========================================================="
-echo "A process has exited!"
+echo "main.py has exited."
 echo "Exit code: $EXIT_CODE"
 echo "=========================================================="
-
-if ! kill -0 "$GESTURES_PID" 2>/dev/null; then
-    echo "gestures.py has stopped or crashed."
-fi
-
-if ! kill -0 "$MAIN_PID" 2>/dev/null; then
-    echo "main.py has stopped or crashed."
-fi
 
 cleanup
 
