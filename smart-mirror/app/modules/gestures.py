@@ -108,18 +108,21 @@ def _detect_palm(
     tensor   = _preprocess(frame, PALM_INPUT_SIZE)
     outputs  = session.run(None, {inp_name: tensor})
 
-    # The PINTO post-processing model outputs [boxes, scores]
-    # boxes  shape: (1, N, 4)  → [cx, cy, bw, bh] normalised to [0,1]
-    # scores shape: (1, N, 1)  → confidence
-    boxes  = outputs[0][0]   # (N, 4)
-    scores = outputs[1][0]   # (N, 1)
+    # This "_post" model bakes in decoding + NMS and returns ONE detections
+    # array. The output name is the schema — each row is 8 values:
+    #   outputs[1] shape (N, 8) = [score, cx, cy, w, wrist_x, wrist_y, mid_x, mid_y]
+    #   outputs[0] is just batch indices — ignore it.
+    dets = outputs[1]                       # (N, 8)
+    if dets.shape[0] == 0:                  # no palms detected this frame
+        return None
 
-    best_idx  = int(np.argmax(scores))
-    best_conf = float(scores[best_idx])
+    best      = dets[int(np.argmax(dets[:, 0]))]   # row with the highest score
+    best_conf = float(best[0])
     if best_conf < PALM_CONF_THRESH:
         return None
 
-    cx, cy, bw, bh = boxes[best_idx]
+    cx, cy, bw = best[1], best[2], best[3]
+    bh = bw                                 # palm detector box is square (single 'w')
 
     # Convert from normalised centre-format to pixel corner-format
     x1 = int((cx - bw / 2) * w)
