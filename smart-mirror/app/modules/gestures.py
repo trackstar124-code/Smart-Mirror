@@ -191,6 +191,21 @@ def _draw_landmarks(frame: np.ndarray, hand: HandResult) -> None:
         cv2.circle(frame, pt, 5, (0, 180, 0),      1, cv2.LINE_AA)
 
 
+def _draw_hud(frame: np.ndarray, label: str, box=None) -> None:
+    """Overlay the current gesture label (and palm box) for live debugging.
+
+    Drawn twice — a thick black copy under a thinner green one — so the text
+    stays readable over any background.
+    """
+    if box is not None:
+        x1, y1, x2, y2 = box
+        cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 220, 0), 2)
+
+    org = (12, 44)
+    cv2.putText(frame, label, org, cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 0),   5, cv2.LINE_AA)
+    cv2.putText(frame, label, org, cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 0), 2, cv2.LINE_AA)
+
+
 # ── Public helpers (unchanged API) ────────────────────────────────────────────
 
 def write_gesture(gesture: str) -> None:
@@ -334,6 +349,7 @@ def run() -> None:
             gesture  = detect_gesture(hand)
 
             _draw_landmarks(frame, hand)
+            _draw_hud(frame, gesture, box)      # live label + palm box
 
             # ── Swipe detection (unchanged logic) ─────────────────────────
             if prev_x is not None:
@@ -350,6 +366,7 @@ def run() -> None:
                 last_gesture = gesture
         else:
             prev_x = None
+            _draw_hud(frame, "NO HAND")         # nothing detected this frame
             if last_gesture != "NONE":
                 write_gesture("NONE")
                 last_gesture = "NONE"
