@@ -234,6 +234,11 @@ def detect_gesture(hand: HandResult) -> str:
     if hand.landmark[16].y < hand.landmark[14].y: fingers_up += 1
     if hand.landmark[20].y < hand.landmark[18].y: fingers_up += 1
 
+    # DEBUG (remove later): the raw signals behind the gesture decision.
+    pinch_dist = distance(hand.landmark[4], hand.landmark[8])
+    print(f"[gesture] fingers_up={fingers_up} pinch={pinch_dist:.3f} "
+          f"middle_up={middle_up} ring_up={ring_up} pinky_up={pinky_up}", flush=True)
+
     # OK sign: thumb-index pinch with the remaining fingers extended
     if pinch and middle_up and ring_up and pinky_up:
         return "OK"
