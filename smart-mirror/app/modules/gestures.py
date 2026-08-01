@@ -239,13 +239,77 @@ def detect_gesture(hand: HandResult) -> str:
         return "UNKNOWN"
 
 
+# ── Camera abstraction ─────────────────────────────────────────────────────────
+
+class Camera:
+    """
+    Thin capture wrapper that prefers Picamera2 (the libcamera stack the Pi 5
+    CSI ribbon camera uses) and falls back to cv2.VideoCapture for USB webcams
+    and dev machines. It mirrors the small slice of the cv2.VideoCapture API the
+    loop needs — is_opened() / read() / release() — so run() barely changes.
+    """
+
+    def __init__(self, size: tuple[int, int] = (640, 480)) -> None:
+        self._picam2 = None   # Picamera2 handle, when the CSI camera is used
+        self._cap = None      # cv2.VideoCapture handle, when falling back
+
+        try:
+            from picamera2 import Picamera2
+            self._picam2 = Picamera2()
+            config = self._picam2.create_preview_configuration(
+                main={"format": "RGB888", "size": size}
+            )
+            self._picam2.configure(config)
+            self._picam2.start()
+        except Exception as exc:
+            # picamera2 not installed, or no CSI camera → try a normal webcam.
+            print(f"Picamera2 unavailable ({exc}); falling back to cv2.VideoCapture(0)")
+            self._cap = cv2.VideoCapture(0)
+
+    def is_opened(self) -> bool:
+        if self._picam2 is not None:
+            return True
+        return self._cap is not None and self._cap.isOpened()
+
+    def read(self) -> tuple[bool, Optional[np.ndarray]]:
+        """Return (ret, frame) like cv2.VideoCapture.read(); frame is BGR."""
+        if self._picam2 is not None:
+            frame = self._picam2.capture_array()   # (H, W, 3)
+            # Picamera2's "RGB888" format actually yields channels in B,G,R
+            # order in the numpy array — i.e. already BGR, which is what the
+            # rest of the pipeline (cv2 drawing, cvtColor BGR2RGB, imshow)
+            # expects. If your colours come out swapped, wrap this line in
+            # cv2.cvtColor(frame, cv2.COLOR_RGB2BGR).
+            return True, frame
+        return self._cap.read()
+
+    def release(self) -> None:
+        if self._picam2 is not None:
+            self._picam2.stop()
+            self._picam2.close()
+        elif self._cap is not None:
+            self._cap.release()
+
+
 # ── Main camera loop ───────────────────────────────────────────────────────────
 
 def run() -> None:
     """Camera loop: detect gesture each frame, write it only when it changes."""
     palm_sess, land_sess = _get_sessions()   # triggers model download if needed
 
-    cap          = cv2.VideoCapture(0)
+    cap          = Camera()
+    if not cap.is_opened():
+        print(
+            "ERROR: could not open a camera.\n"
+            "  - CSI ribbon camera (Pi 5): install Picamera2 with\n"
+            "      sudo apt install -y python3-picamera2\n"
+            "    and verify the camera with `rpicam-hello --list-cameras`.\n"
+            "  - USB webcam: check `ls /dev/video*` and permissions.\n"
+            "Gesture thread exiting."
+        )
+        cap.release()
+        return
+
     last_gesture: Optional[str] = None
     prev_x:       Optional[float] = None
 
@@ -290,7 +354,14 @@ def run() -> None:
                 print(f"OpenCV display error: {e}")
 
     cap.release()
-    cv2.destroyAllWindows()
+    # Only tear down GUI windows if we actually created any. On a headless
+    # OpenCV build (no GTK, as on the Pi) destroyAllWindows() raises
+    # "The function is not implemented", so guard it the same way as imshow.
+    if os.environ.get("DISPLAY"):
+        try:
+            cv2.destroyAllWindows()
+        except cv2.error:
+            pass
 
 
 if __name__ == "__main__":

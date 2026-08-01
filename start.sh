@@ -25,6 +25,17 @@ fi
 
 echo "Using Python: $("$PYTHON" --version)"
 
+# ── System camera stack (Raspberry Pi only) ────────────────────────────────────
+# The CSI ribbon camera is driven by Picamera2, which is an apt package (NOT
+# pip-installable). Only run this where apt exists (i.e. the Pi / Debian); it is
+# skipped automatically on macOS, which falls back to cv2.VideoCapture.
+if command -v apt-get &> /dev/null; then
+    if ! "$PYTHON" -c "import picamera2" &> /dev/null; then
+        echo "Installing Picamera2 (CSI camera support)..."
+        sudo apt-get install -y python3-picamera2
+    fi
+fi
+
 # Recreate the virtual environment if it was built with a different Python version
 if [ -d "$VENV_DIR" ]; then
     VENV_PY="$VENV_DIR/bin/python"
@@ -40,9 +51,11 @@ if [ -d "$VENV_DIR" ]; then
 fi
 
 # Create virtual environment
+# --system-site-packages lets the venv see apt-installed packages like
+# python3-picamera2, which cannot be installed with pip.
 if [ ! -d "$VENV_DIR" ]; then
-    echo "Creating virtual environment with Python 3.11..."
-    "$PYTHON" -m venv "$VENV_DIR"
+    echo "Creating virtual environment..."
+    "$PYTHON" -m venv --system-site-packages "$VENV_DIR"
 fi
 
 # Activate virtual environment
