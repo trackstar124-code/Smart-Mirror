@@ -41,7 +41,10 @@ HAND_CONNECTIONS = [
 PALM_INPUT_SIZE  = 192   # palm detector expects 192×192
 LAND_INPUT_SIZE  = 224   # landmark model expects 224×224
 PALM_CONF_THRESH = 0.50  # minimum palm-detection confidence
-PALM_PAD         = 0.20  # fractional padding around the detected palm box
+PALM_PAD         = 0.80  # fractional padding around the detected palm box.
+                         # The detector only boxes the PALM; fingers extend well
+                         # past it, so we pad generously to capture the whole hand
+                         # (both for the on-screen box and the landmark crop).
 
 
 # ── Thin dataclass that mirrors mediapipe NormalizedLandmark ──────────────────
