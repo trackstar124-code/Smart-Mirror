@@ -118,10 +118,6 @@ def _detect_palm(
 
     best      = dets[int(np.argmax(dets[:, 0]))]   # row with the highest score
     best_conf = float(best[0])
-    # DEBUG (remove later): shows whether the palm detector fires and what the
-    # raw box values look like — tells us confidence + normalized-vs-pixel coords.
-    print(f"[palm] n={dets.shape[0]} conf={best_conf:.2f} "
-          f"cx={best[1]:.3f} cy={best[2]:.3f} w={best[3]:.3f}", flush=True)
     if best_conf < PALM_CONF_THRESH:
         return None
 
@@ -220,10 +216,15 @@ def detect_gesture(hand: HandResult) -> str:
     """
     Classify the hand pose into FIST, OPEN_PALM, OK, or UNKNOWN.
 
-    Uses the same landmark indices and thresholds as the original
-    MediaPipe implementation — no logic changes required.
+    Landmark indices follow MediaPipe's 21-point hand topology.
     """
-    pinch      = distance(hand.landmark[4], hand.landmark[8]) < 0.05
+    # Pinch must be measured RELATIVE to hand size, not as an absolute distance:
+    # the thumb-index gap shrinks when the hand is far from the camera and grows
+    # when it's close, so a fixed threshold only works at one distance. We use
+    # the wrist→middle-finger-base length (landmarks 0 and 9) as a scale-invariant
+    # "hand unit", then call it a pinch when the gap is under 40% of that unit.
+    hand_size  = distance(hand.landmark[0], hand.landmark[9]) or 1e-6  # avoid /0
+    pinch      = distance(hand.landmark[4], hand.landmark[8]) < 0.40 * hand_size
     middle_up  = hand.landmark[12].y < hand.landmark[10].y
     ring_up    = hand.landmark[16].y < hand.landmark[14].y
     pinky_up   = hand.landmark[20].y < hand.landmark[18].y
@@ -233,11 +234,6 @@ def detect_gesture(hand: HandResult) -> str:
     if hand.landmark[12].y < hand.landmark[10].y: fingers_up += 1
     if hand.landmark[16].y < hand.landmark[14].y: fingers_up += 1
     if hand.landmark[20].y < hand.landmark[18].y: fingers_up += 1
-
-    # DEBUG (remove later): the raw signals behind the gesture decision.
-    pinch_dist = distance(hand.landmark[4], hand.landmark[8])
-    print(f"[gesture] fingers_up={fingers_up} pinch={pinch_dist:.3f} "
-          f"middle_up={middle_up} ring_up={ring_up} pinky_up={pinky_up}", flush=True)
 
     # OK sign: thumb-index pinch with the remaining fingers extended
     if pinch and middle_up and ring_up and pinky_up:
