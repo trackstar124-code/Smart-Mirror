@@ -1,6 +1,6 @@
 # Week 1
 requests                          # making HTTP calls to the weather API
-opencv-python-headless==4.11.0.86 # webcam + cv2 (headless build for Raspberry Pi)
+opencv-python; sys_platform == "darwin"  # macOS: GUI-capable cv2. On Pi/Linux, start.sh installs apt python3-opencv (GTK) instead — do NOT pip-install OpenCV there or it shadows the GTK build and breaks cv2.imshow.
 python-dotenv                     # loads variables from a .env file into the environment
 
 # Week 2
