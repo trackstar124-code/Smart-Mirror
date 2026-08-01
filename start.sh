@@ -34,6 +34,12 @@ if command -v apt-get &> /dev/null; then
         echo "Installing Picamera2 (CSI camera support)..."
         sudo apt-get install -y python3-picamera2
     fi
+    # GUI-capable OpenCV (built with GTK) so cv2.imshow works. The pip ARM wheel
+    # is headless/unreliable, so we use the apt package on the Pi instead.
+    if ! "$PYTHON" -c "import cv2; assert hasattr(cv2, 'imshow')" &> /dev/null; then
+        echo "Installing GTK-enabled OpenCV (python3-opencv)..."
+        sudo apt-get install -y python3-opencv
+    fi
 fi
 
 # Recreate the virtual environment if it was built with a different Python version

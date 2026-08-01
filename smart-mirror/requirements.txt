@@ -19,12 +19,17 @@ python-dotenv
 
 # ─── Computer Vision / Gesture Detection (modules/gestures.py) ────────────────
 #
-# PI NOTE ⚠️: "opencv-python" works on your Mac but may fail on Pi because it
-# tries to build a GUI window (cv2.imshow). On a headless Pi you may need:
-#   opencv-python-headless
-# Research: what's the difference between the two packages?
+# We need a GUI-capable OpenCV so cv2.imshow (the gesture preview window) works.
 #
-opencv-python-headless
+#   macOS (dev): pip installs "opencv-python" — its wheel has GUI support (Cocoa).
+#   Pi / Linux : the pip ARM wheel is unreliable for GUI, so we install the apt
+#                package "python3-opencv" instead (built with GTK). start.sh
+#                does this automatically, and the venv sees it via
+#                --system-site-packages. That's why the marker below skips pip
+#                OpenCV on Linux — installing both would let the pip copy shadow
+#                the GTK one and break imshow again.
+#
+opencv-python; sys_platform == "darwin"
 
 # Numerical arrays — preprocessing tensors for ONNX inference.
 numpy
