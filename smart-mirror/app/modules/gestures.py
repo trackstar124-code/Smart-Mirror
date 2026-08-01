@@ -118,6 +118,10 @@ def _detect_palm(
 
     best      = dets[int(np.argmax(dets[:, 0]))]   # row with the highest score
     best_conf = float(best[0])
+    # DEBUG (remove later): shows whether the palm detector fires and what the
+    # raw box values look like — tells us confidence + normalized-vs-pixel coords.
+    print(f"[palm] n={dets.shape[0]} conf={best_conf:.2f} "
+          f"cx={best[1]:.3f} cy={best[2]:.3f} w={best[3]:.3f}", flush=True)
     if best_conf < PALM_CONF_THRESH:
         return None
 
