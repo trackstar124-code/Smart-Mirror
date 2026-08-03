@@ -354,14 +354,17 @@ def run() -> None:
             _draw_landmarks(frame, hand)
             _draw_hud(frame, gesture, box)      # live label + palm box
 
-            # ── Swipe detection (unchanged logic) ─────────────────────────
-            if prev_x is not None:
-                dx = wrist_x - prev_x
-                if dx > 0.1:
-                    write_gesture("Swipe Right")
-                elif dx < -0.1:
-                    write_gesture("Swipe Left")
-            prev_x = wrist_x
+            # ── Swipe detection (DISABLED) ────────────────────────────────
+            # Swipes were overwriting the static FIST/OK gesture on any small
+            # hand jitter (dx > 0.1), so nothing downstream registered them.
+            # Hashed out for now — uncomment to re-enable.
+            # if prev_x is not None:
+            #     dx = wrist_x - prev_x
+            #     if dx > 0.1:
+            #         write_gesture("Swipe Right")
+            #     elif dx < -0.1:
+            #         write_gesture("Swipe Left")
+            # prev_x = wrist_x
 
             # ── Static gesture (write only on change) ─────────────────────
             if gesture != last_gesture:
