@@ -14,3 +14,10 @@ __pycache__/
 .DS_Store
 .vscode/
 .idea/
+
+# Gesture IPC scratch files. Both are written by the camera thread at runtime
+# and recreated automatically, so there's nothing to preserve. Committing them
+# means every run shows up as a diff, and merges conflict over whichever hand
+# pose each machine happened to see last.
+smart-mirror/app/modules/gesture_state.txt
+smart-mirror/app/modules/gesture_event.txt

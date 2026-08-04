@@ -14,7 +14,7 @@ from modules.month import get_calendar
 from modules.events import get_events
 from modules.weather import get_weather, get_forecast
 from modules.clock import get_time
-from modules.gestures import read_gesture
+from modules.gestures import read_gesture, pop_event
 from modules.news import get_news
 from flask import Flask, render_template, jsonify
 
@@ -42,7 +42,15 @@ def index():
 
 @app.route("/api/gesture")
 def api_gesture():
-    return jsonify({"gesture": read_gesture()})
+    """
+    Two separate fields, because they behave differently:
+      gesture -> the CURRENT pose ("FIST", "OK", "NONE"). Safe to read repeatedly;
+                 it stays the same until the hand changes.
+      event   -> a one-shot swipe, or "" if nothing happened. POPPED here, so it
+                 is returned to exactly one poll and then gone. Don't add another
+                 caller to this endpoint or they'll steal each other's events.
+    """
+    return jsonify({"gesture": read_gesture(), "event": pop_event()})
 
 @app.route("/api/weather")
 def api_weather():

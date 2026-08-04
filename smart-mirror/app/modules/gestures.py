@@ -19,13 +19,22 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 import os
+import time
 
 import sys as _sys
 _sys.path.insert(0, str(Path(__file__).parent))   # ensure modules/ dir is importable
 from download_models import ensure_models
 
-# ── Shared state file ──────────────────────────────────────────────────────────
+# ── Shared state files ─────────────────────────────────────────────────────────
+# Two channels, because poses and swipes are different kinds of signal:
+#   STATE_FILE holds a POSE  — continuously true while the hand holds it.
+#              Overwritten on every change; the reader just asks "what now?".
+#   EVENT_FILE holds an EVENT — a swipe, true for one instant only.
+#              The reader POPS it (read-then-clear) so each swipe fires once.
+# Sharing one file was the original bug: swipes stomped the pose and the pose
+# never got rewritten, so the file froze on "Swipe Right".
 STATE_FILE = Path(__file__).parent / "gesture_state.txt"
+EVENT_FILE = Path(__file__).parent / "gesture_event.txt"
 
 # ── MediaPipe-compatible hand connection topology (21 landmarks) ───────────────
 HAND_CONNECTIONS = [
@@ -225,6 +234,29 @@ def read_gesture() -> str:
     return "UNKNOWN"
 
 
+def push_event(event: str) -> None:
+    """Publish a one-shot gesture event (e.g. "Swipe Left") for the UI to pop."""
+    with open(EVENT_FILE, "w") as f:
+        f.write(event)
+
+
+def pop_event() -> str:
+    """
+    Return the pending event and clear it, so each event is delivered ONCE.
+
+    This read-then-clear ("pop") is what makes swipes work: the camera loop
+    runs at ~30fps but the browser polls every 300ms, so an event left sitting
+    in a file would either be missed entirely or re-fired on every poll.
+    """
+    if not EVENT_FILE.exists():
+        return ""
+    with open(EVENT_FILE, "r") as f:
+        event = f.read().strip()
+    if event:
+        open(EVENT_FILE, "w").close()   # truncate — the event is now consumed
+    return event
+
+
 def distance(a: Landmark, b: Landmark) -> float:
     """Euclidean distance between two Landmark objects (x, y only)."""
     return ((a.x - b.x) ** 2 + (a.y - b.y) ** 2) ** 0.5
@@ -263,6 +295,86 @@ def detect_gesture(hand: HandResult) -> str:
         return "FIST"
     else:
         return "UNKNOWN"
+
+
+# ── Swipe detection ────────────────────────────────────────────────────────────
+
+SWIPE_MIN_TRAVEL = 0.25   # hand must cross 25% of the frame width to count
+SWIPE_MAX_MS     = 600    # ...and do it within 600ms (a swipe is FAST)
+SWIPE_COOLDOWN_MS = 800   # ignore new swipes this long after one fires
+
+
+class SwipeTracker:
+    """
+    Turns a stream of per-frame wrist positions into discrete swipe events.
+
+    Why a class and not the old two-line `dx > 0.1` check? A swipe is a motion
+    over TIME, so one frame-to-frame delta can't describe it:
+      - the ONNX landmark model jitters, and a jump in the palm box makes
+        wrist_x lurch several percent in a single frame → false positives
+      - a real, deliberate swipe is spread over ~10 frames, each contributing a
+        small dx → a per-frame threshold big enough to reject jitter is also
+        big enough to reject the actual swipe
+    So instead we keep a short history and ask: did the hand travel far enough,
+    fast enough, in one consistent direction?
+    """
+
+    def __init__(self) -> None:
+        self._history: list[tuple[float, float]] = []   # [(timestamp, wrist_x)]
+        # None, not 0.0: with 0.0 the very first swipe looks like it happened
+        # 'now - 0.0' seconds after a previous one, which is inside the cooldown
+        # whenever the clock is still small -- so the first swipe gets eaten.
+        self._last_fire_t: Optional[float] = None
+
+    def reset(self) -> None:
+        """Call when the hand leaves frame — old positions are meaningless now."""
+        self._history.clear()
+
+    def update(self, wrist_x: float, now: float) -> Optional[str]:
+        """
+        Feed one frame's wrist x-position (0..1) and the current time (seconds).
+
+        Returns "Swipe Left" / "Swipe Right" on the frame a swipe completes,
+        otherwise None.
+        """
+        self._history.append((now, wrist_x))
+
+        # Keep only the last SWIPE_MAX_MS of motion. This sliding window is what
+        # enforces the "fast" half of the definition: if the hand takes 2 seconds
+        # to cross the frame, the early positions have already aged out and the
+        # remaining span is too small to trigger. Slow drift can never fire.
+        cutoff = now - SWIPE_MAX_MS / 1000.0
+        while self._history and self._history[0][0] < cutoff:
+            self._history.pop(0)
+
+        # Cooldown: a swipe is one physical motion, but the hand keeps moving
+        # (and decelerating) for a few frames afterward. Without this, the tail
+        # of the motion re-triggers.
+        if (self._last_fire_t is not None
+                and now - self._last_fire_t < SWIPE_COOLDOWN_MS / 1000.0):
+            return None
+
+        # A "swipe" built from 2 samples is indistinguishable from one bad frame
+        # where the palm box jumped. Demand a few frames of evidence.
+        if len(self._history) < 3:
+            return None
+
+        # Oldest vs newest position in the window. Using the endpoints (rather
+        # than summing per-frame deltas) means a back-and-forth wave nets out to
+        # ~0 and correctly does NOT count as a swipe.
+        travel = self._history[-1][1] - self._history[0][1]
+        if abs(travel) < SWIPE_MIN_TRAVEL:
+            return None
+
+        self._last_fire_t = now
+        self.reset()   # discard the motion we just consumed, or it fires again
+
+        # Direction: the frame is never flipped, so the camera sees you the way
+        # another person would — your right hand appears on the LEFT of the
+        # image. Moving your hand toward your own left therefore makes wrist_x
+        # INCREASE. Hence travel > 0 => "Swipe Left".
+        # If it feels backwards when you test it, swap these two strings.
+        return "Swipe Left" if travel > 0 else "Swipe Right"
 
 
 # ── Camera abstraction ─────────────────────────────────────────────────────────
@@ -337,7 +449,7 @@ def run() -> None:
         return
 
     last_gesture: Optional[str] = None
-    prev_x:       Optional[float] = None
+    swipes = SwipeTracker()
 
     while True:
         ret, frame = cap.read()
@@ -354,24 +466,19 @@ def run() -> None:
             _draw_landmarks(frame, hand)
             _draw_hud(frame, gesture, box)      # live label + palm box
 
-            # ── Swipe detection (DISABLED) ────────────────────────────────
-            # Swipes were overwriting the static FIST/OK gesture on any small
-            # hand jitter (dx > 0.1), so nothing downstream registered them.
-            # Hashed out for now — uncomment to re-enable.
-            # if prev_x is not None:
-            #     dx = wrist_x - prev_x
-            #     if dx > 0.1:
-            #         write_gesture("Swipe Right")
-            #     elif dx < -0.1:
-            #         write_gesture("Swipe Left")
-            # prev_x = wrist_x
+            # ── Swipe detection → EVENT channel ───────────────────────────
+            # Note this writes to a DIFFERENT file than the pose below, so the
+            # two can never clobber each other.
+            swipe = swipes.update(wrist_x, time.monotonic())
+            if swipe is not None:
+                push_event(swipe)
 
-            # ── Static gesture (write only on change) ─────────────────────
+            # ── Static gesture → POSE channel (write only on change) ──────
             if gesture != last_gesture:
                 write_gesture(gesture)
                 last_gesture = gesture
         else:
-            prev_x = None
+            swipes.reset()
             _draw_hud(frame, "NO HAND")         # nothing detected this frame
             if last_gesture != "NONE":
                 write_gesture("NONE")

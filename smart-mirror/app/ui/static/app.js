@@ -38,6 +38,24 @@ function pollGesture() {
         .then(response => response.json())
         .then(data => {
             const now = Date.now();
+
+            // --- Swipe EVENTS: handle these FIRST, and outside the cooldown. ---
+            // The server already popped the event, so if we bail out early here
+            // the swipe is lost forever. The SwipeTracker's own cooldown in
+            // gestures.py is what prevents repeats, so we don't need one here.
+            if (data.event === "Swipe Right" || data.event === "Swipe Left") {
+                const step = data.event === "Swipe Right" ? 1 : -1;
+                // + views.length keeps the result positive when step is -1,
+                // so index -1 wraps to the last view instead of breaking.
+                showView((current + step + views.length) % views.length);
+                // Stamp the pose cooldown too: your hand is very likely still
+                // open right after a swipe, and without this the pose branch
+                // below would fire on the next poll and undo the swipe.
+                lastCall = now;
+                return;
+            }
+
+            // --- POSE: continuously true, so the cooldown belongs here ---
             if (now - lastCall < COOLDOWN_MS) return;
             switch (data.gesture) {
                 case "OK":
