@@ -10,7 +10,7 @@ A fullscreen smart mirror dashboard built with Flask and Python, designed to run
 - 🌤️ **Real-time Weather** (auto-detects location via IP)
 - 📅 **Monthly Calendar**
 - 📋 **Upcoming Events** (from a local JSON file)
-- ✋ **Gesture Control** — FIST, OPEN_PALM, OK, Swipe Left/Right
+- ✋ **Gesture Control** — FIST, OPEN_PALM, OK
 
 ---
 
@@ -168,5 +168,3 @@ chromium-browser --kiosk --noerrdialogs http://localhost:8000
 | `OPEN_PALM` | All 4 fingers extended |
 | `FIST` | No fingers extended |
 | `OK` | Pinch + middle/ring/pinky up |
-| `Swipe Left` | Wrist moves left rapidly |
-| `Swipe Right` | Wrist moves right rapidly |
